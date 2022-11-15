@@ -44,66 +44,6 @@ blocks:
     coordinate: [256, 348]
     rotation: 0
     state: enabled
-- name: decimate_2
-  id: variable
-  parameters:
-    comment: ''
-    value: '16'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [560, 316]
-    rotation: 0
-    state: enabled
-- name: decimate_3
-  id: variable
-  parameters:
-    comment: ''
-    value: final_decimation
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [832, 316]
-    rotation: 0
-    state: enabled
-- name: samp_rate2
-  id: variable
-  parameters:
-    comment: ''
-    value: samp_rate/decimate_1
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [456, 181]
-    rotation: 0
-    state: enabled
-- name: samp_rate3
-  id: variable
-  parameters:
-    comment: ''
-    value: samp_rate2/decimate_2
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [728, 181]
-    rotation: 0
-    state: enabled
-- name: samp_rate4
-  id: variable
-  parameters:
-    comment: ''
-    value: samp_rate3/decimate_3
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [992, 181]
-    rotation: 0
-    state: enabled
 - name: taps1
   id: variable
   parameters:
@@ -127,56 +67,6 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [256, 181]
-    rotation: 0
-    state: enabled
-- name: taps2
-  id: variable
-  parameters:
-    comment: ''
-    value: firdes.low_pass_2(1.0, samp_rate2, 1.5e3, 16e3-1.5e3, 60.0, firdes.WIN_BLACKMAN_HARRIS,
-      6.76)
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [560, 117]
-    rotation: 0
-    state: enabled
-- name: taps2_len
-  id: variable
-  parameters:
-    comment: ''
-    value: len(taps2)
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [560, 181]
-    rotation: 0
-    state: enabled
-- name: taps3
-  id: variable
-  parameters:
-    comment: ''
-    value: firdes.low_pass_2(1.0, samp_rate3, 1.5e3, 0.3e3, 30.0, firdes.WIN_KAISER,
-      6.76/2)
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [832, 117]
-    rotation: 0
-    state: enabled
-- name: taps3_len
-  id: variable
-  parameters:
-    comment: ''
-    value: len(taps3)
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [832, 181]
     rotation: 0
     state: enabled
 - name: blocks_file_source_0
@@ -254,44 +144,6 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [760, 4]
-    rotation: 0
-    state: enabled
-- name: fir_filter_xxx_0_0
-  id: fir_filter_xxx
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    decim: decimate_2
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    samp_delay: '0'
-    taps: taps2
-    type: ccf
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [560, 245]
-    rotation: 0
-    state: enabled
-- name: fir_filter_xxx_0_0_0
-  id: fir_filter_xxx
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    decim: decimate_3
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    samp_delay: '0'
-    taps: taps3
-    type: ccf
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [832, 245]
     rotation: 0
     state: enabled
 - name: freq_xlating_fir_filter_xxx_0
@@ -769,9 +621,7 @@ blocks:
 connections:
 - [blocks_file_source_0, '0', blocks_throttle_0, '0']
 - [blocks_throttle_0, '0', freq_xlating_fir_filter_xxx_0, '0']
-- [fir_filter_xxx_0_0, '0', fir_filter_xxx_0_0_0, '0']
-- [fir_filter_xxx_0_0_0, '0', blocks_udp_sink_0, '0']
-- [freq_xlating_fir_filter_xxx_0, '0', fir_filter_xxx_0_0, '0']
+- [freq_xlating_fir_filter_xxx_0, '0', blocks_udp_sink_0, '0']
 - [osmosdr_source_0, '0', freq_xlating_fir_filter_xxx_0, '0']
 
 metadata:
