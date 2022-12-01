@@ -1,6 +1,7 @@
 options:
   parameters:
     author: ''
+    catch_exceptions: 'True'
     category: '[GRC Hier Blocks]'
     cmake_opt: ''
     comment: ''
@@ -8,7 +9,7 @@ options:
     description: ''
     gen_cmake: 'On'
     gen_linking: dynamic
-    generate_options: no_gui
+    generate_options: qt_gui
     hier_block_src_path: '.:'
     id: UDPDecimate
     max_nouts: '0'
@@ -36,7 +37,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '16'
+    value: '15'
   states:
     bus_sink: false
     bus_source: false
@@ -48,7 +49,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '16'
+    value: '10'
   states:
     bus_sink: false
     bus_source: false
@@ -60,7 +61,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '4'
+    value: '5'
   states:
     bus_sink: false
     bus_source: false
@@ -108,7 +109,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: firdes.low_pass_2(1.0, samp_rate, 1.5e3, 128e3-1.5e3, 60.0, firdes.WIN_BLACKMAN_HARRIS,
+    value: firdes.low_pass_2(1.0, samp_rate, 1.5e3, 128e3-1.5e3, 60.0, window.win_type.WIN_BLACKMAN_HARRIS,
       6.76)
   states:
     bus_sink: false
@@ -133,7 +134,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: firdes.low_pass_2(1.0, samp_rate2, 1.5e3, 16e3-1.5e3, 60.0, firdes.WIN_BLACKMAN_HARRIS,
+    value: firdes.low_pass_2(1.0, samp_rate2, 1.5e3, 16e3-1.5e3, 60.0, window.win_type.WIN_BLACKMAN_HARRIS,
       6.76)
   states:
     bus_sink: false
@@ -158,7 +159,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: firdes.low_pass_2(1.0, samp_rate3, 1.5e3, 0.3e3, 30.0, firdes.WIN_KAISER,
+    value: firdes.low_pass_2(1.0, samp_rate3, 1.5e3, 0.3e3, 30.0, window.win_type.WIN_KAISER,
       6.76/2)
   states:
     bus_sink: false
@@ -220,25 +221,6 @@ blocks:
     coordinate: [75, 510]
     rotation: 0
     state: disabled
-- name: blocks_udp_sink_0
-  id: blocks_udp_sink
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    eof: 'True'
-    ipaddr: 10.0.0.180
-    port: '20000'
-    psize: '1472'
-    type: complex
-    vlen: '1'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [1308, 305]
-    rotation: 0
-    state: true
 - name: final_decimation
   id: parameter
   parameters:
@@ -357,6 +339,26 @@ blocks:
     coordinate: [304, 12]
     rotation: 0
     state: enabled
+- name: network_udp_sink_0
+  id: network_udp_sink
+  parameters:
+    addr: 127.0.0.1
+    affinity: ''
+    alias: ''
+    comment: ''
+    header: '0'
+    payloadsize: '1472'
+    port: '20000'
+    send_eof: 'False'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1144, 284.0]
+    rotation: 0
+    state: true
 - name: osmosdr_source_0
   id: osmosdr_source
   parameters:
@@ -769,7 +771,7 @@ blocks:
 connections:
 - [blocks_file_source_0, '0', blocks_throttle_0, '0']
 - [fir_filter_xxx_0_0, '0', fir_filter_xxx_0_0_0, '0']
-- [fir_filter_xxx_0_0_0, '0', blocks_udp_sink_0, '0']
+- [fir_filter_xxx_0_0_0, '0', network_udp_sink_0, '0']
 - [freq_xlating_fir_filter_xxx_0, '0', fir_filter_xxx_0_0, '0']
 - [osmosdr_source_0, '0', freq_xlating_fir_filter_xxx_0, '0']
 
