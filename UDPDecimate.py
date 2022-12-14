@@ -6,30 +6,26 @@
 #
 # GNU Radio Python Flow Graph
 # Title: Udpdecimate
-# GNU Radio version: 3.10.1.1
+# GNU Radio version: 3.8.1.0
 
+from gnuradio import blocks
 from gnuradio import filter
 from gnuradio.filter import firdes
 from gnuradio import gr
-from gnuradio.fft import window
 import sys
 import signal
 from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
-from gnuradio import network
 import cmath
 import math
 import osmosdr
 import time
 
-
-
-
 class UDPDecimate(gr.top_block):
 
     def __init__(self, final_decimation=4, gain=21, pulse_duration=0.015, pulse_freq=146000000, samp_rate=3e6):
-        gr.top_block.__init__(self, "Udpdecimate", catch_exceptions=True)
+        gr.top_block.__init__(self, "Udpdecimate")
 
         ##################################################
         # Parameters
@@ -46,10 +42,10 @@ class UDPDecimate(gr.top_block):
         self.decimate_1 = decimate_1 = 15
         self.samp_rate2 = samp_rate2 = samp_rate/decimate_1
         self.decimate_2 = decimate_2 = 10
+        self.taps3 = taps3 = firdes.low_pass(1.0, samp_rate, 1.5e3,0.3e3, firdes.WIN_KAISER, 6.76 / 2)
+        self.taps2 = taps2 = firdes.low_pass(1.0, samp_rate, 1.5e3,16e3 - 1.5e3, firdes.WIN_BLACKMAN, 6.76)
+        self.taps1 = taps1 = firdes.low_pass(1.0, samp_rate, 1.5e3,128e3 - 1.5e3, firdes.WIN_BLACKMAN, 6.76)
         self.samp_rate3 = samp_rate3 = samp_rate2/decimate_2
-        self.taps3 = taps3 = firdes.low_pass_2(1.0, samp_rate3, 1.5e3, 0.3e3, 30.0, window.win_type.WIN_KAISER, 6.76/2)
-        self.taps2 = taps2 = firdes.low_pass_2(1.0, samp_rate2, 1.5e3, 16e3-1.5e3, 60.0, window.win_type.WIN_BLACKMAN_HARRIS, 6.76)
-        self.taps1 = taps1 = firdes.low_pass_2(1.0, samp_rate, 1.5e3, 128e3-1.5e3, 60.0, window.win_type.WIN_BLACKMAN_HARRIS, 6.76)
         self.decimate_3 = decimate_3 = 5
         self.taps3_len = taps3_len = len(taps3)
         self.taps2_len = taps2_len = len(taps2)
@@ -67,30 +63,27 @@ class UDPDecimate(gr.top_block):
         self.osmosdr_source_0.set_sample_rate(samp_rate)
         self.osmosdr_source_0.set_center_freq(pulse_freq, 0)
         self.osmosdr_source_0.set_freq_corr(0, 0)
-        self.osmosdr_source_0.set_dc_offset_mode(0, 0)
-        self.osmosdr_source_0.set_iq_balance_mode(0, 0)
-        self.osmosdr_source_0.set_gain_mode(False, 0)
         self.osmosdr_source_0.set_gain(gain, 0)
         self.osmosdr_source_0.set_if_gain(20, 0)
         self.osmosdr_source_0.set_bb_gain(20, 0)
         self.osmosdr_source_0.set_antenna('', 0)
         self.osmosdr_source_0.set_bandwidth(0, 0)
-        self.network_udp_sink_0 = network.udp_sink(gr.sizeof_gr_complex, 1, '127.0.0.1', 20000, 0, 1472, False)
         self.freq_xlating_fir_filter_xxx_0 = filter.freq_xlating_fir_filter_ccc(decimate_1, taps1, 0, samp_rate)
         self.fir_filter_xxx_0_0_0 = filter.fir_filter_ccf(decimate_3, taps3)
         self.fir_filter_xxx_0_0_0.declare_sample_delay(0)
         self.fir_filter_xxx_0_0 = filter.fir_filter_ccf(decimate_2, taps2)
         self.fir_filter_xxx_0_0.declare_sample_delay(0)
+        self.blocks_udp_sink_0 = blocks.udp_sink(gr.sizeof_gr_complex*1, '127.0.0.1', 20000, 1472, True)
+
 
 
         ##################################################
         # Connections
         ##################################################
         self.connect((self.fir_filter_xxx_0_0, 0), (self.fir_filter_xxx_0_0_0, 0))
-        self.connect((self.fir_filter_xxx_0_0_0, 0), (self.network_udp_sink_0, 0))
+        self.connect((self.fir_filter_xxx_0_0_0, 0), (self.blocks_udp_sink_0, 0))
         self.connect((self.freq_xlating_fir_filter_xxx_0, 0), (self.fir_filter_xxx_0_0, 0))
         self.connect((self.osmosdr_source_0, 0), (self.freq_xlating_fir_filter_xxx_0, 0))
-
 
     def get_final_decimation(self):
         return self.final_decimation
@@ -124,7 +117,6 @@ class UDPDecimate(gr.top_block):
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
         self.set_samp_rate2(self.samp_rate/self.decimate_1)
-        self.set_taps1(firdes.low_pass_2(1.0, self.samp_rate, 1.5e3, 128e3-1.5e3, 60.0, window.win_type.WIN_BLACKMAN_HARRIS, 6.76))
         self.osmosdr_source_0.set_sample_rate(self.samp_rate)
 
     def get_decimate_1(self):
@@ -140,7 +132,6 @@ class UDPDecimate(gr.top_block):
     def set_samp_rate2(self, samp_rate2):
         self.samp_rate2 = samp_rate2
         self.set_samp_rate3(self.samp_rate2/self.decimate_2)
-        self.set_taps2(firdes.low_pass_2(1.0, self.samp_rate2, 1.5e3, 16e3-1.5e3, 60.0, window.win_type.WIN_BLACKMAN_HARRIS, 6.76))
 
     def get_decimate_2(self):
         return self.decimate_2
@@ -148,14 +139,6 @@ class UDPDecimate(gr.top_block):
     def set_decimate_2(self, decimate_2):
         self.decimate_2 = decimate_2
         self.set_samp_rate3(self.samp_rate2/self.decimate_2)
-
-    def get_samp_rate3(self):
-        return self.samp_rate3
-
-    def set_samp_rate3(self, samp_rate3):
-        self.samp_rate3 = samp_rate3
-        self.set_samp_rate4(self.samp_rate3/self.decimate_3)
-        self.set_taps3(firdes.low_pass_2(1.0, self.samp_rate3, 1.5e3, 0.3e3, 30.0, window.win_type.WIN_KAISER, 6.76/2))
 
     def get_taps3(self):
         return self.taps3
@@ -180,6 +163,13 @@ class UDPDecimate(gr.top_block):
         self.taps1 = taps1
         self.set_taps1_len(len(self.taps1))
         self.freq_xlating_fir_filter_xxx_0.set_taps(self.taps1)
+
+    def get_samp_rate3(self):
+        return self.samp_rate3
+
+    def set_samp_rate3(self, samp_rate3):
+        self.samp_rate3 = samp_rate3
+        self.set_samp_rate4(self.samp_rate3/self.decimate_3)
 
     def get_decimate_3(self):
         return self.decimate_3
@@ -213,7 +203,6 @@ class UDPDecimate(gr.top_block):
         self.samp_rate4 = samp_rate4
 
 
-
 def argument_parser():
     parser = ArgumentParser()
     parser.add_argument(
@@ -223,13 +212,13 @@ def argument_parser():
         "--gain", dest="gain", type=intx, default=21,
         help="Set Gain [default=%(default)r]")
     parser.add_argument(
-        "--pulse-duration", dest="pulse_duration", type=eng_float, default=eng_notation.num_to_str(float(0.015)),
+        "--pulse-duration", dest="pulse_duration", type=eng_float, default="15.0m",
         help="Set Pulse duration (secs) [default=%(default)r]")
     parser.add_argument(
         "--pulse-freq", dest="pulse_freq", type=intx, default=146000000,
         help="Set Pulse Freq [default=%(default)r]")
     parser.add_argument(
-        "--samp-rate", dest="samp_rate", type=eng_float, default=eng_notation.num_to_str(float(3e6)),
+        "--samp-rate", dest="samp_rate", type=eng_float, default="3.0M",
         help="Set Sample Rate [default=%(default)r]")
     return parser
 
@@ -244,14 +233,12 @@ def main(top_block_cls=UDPDecimate, options=None):
     def sig_handler(sig=None, frame=None):
         tb.stop()
         tb.wait()
-
         sys.exit(0)
 
     signal.signal(signal.SIGINT, sig_handler)
     signal.signal(signal.SIGTERM, sig_handler)
 
     tb.start()
-
     try:
         input('Press Enter to quit: ')
     except EOFError:
