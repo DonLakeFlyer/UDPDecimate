@@ -42,10 +42,10 @@ class UDPDecimate(gr.top_block):
         self.decimate_1 = decimate_1 = 15
         self.samp_rate2 = samp_rate2 = samp_rate/decimate_1
         self.decimate_2 = decimate_2 = 10
-        self.taps3 = taps3 = firdes.low_pass(1.0, samp_rate, 1.5e3,0.3e3, firdes.WIN_KAISER, 6.76 / 2)
-        self.taps2 = taps2 = firdes.low_pass(1.0, samp_rate, 1.5e3,16e3 - 1.5e3, firdes.WIN_BLACKMAN, 6.76)
-        self.taps1 = taps1 = firdes.low_pass(1.0, samp_rate, 1.5e3,128e3 - 1.5e3, firdes.WIN_BLACKMAN, 6.76)
         self.samp_rate3 = samp_rate3 = samp_rate2/decimate_2
+        self.taps3 = taps3 = firdes.low_pass(1.0, samp_rate3, 1.5e3,0.3e3, firdes.WIN_KAISER, 6.76 / 2)
+        self.taps2 = taps2 = firdes.low_pass(1.0, samp_rate2, 1.5e3,16e3 - 1.5e3, firdes.WIN_BLACKMAN, 6.76)
+        self.taps1 = taps1 = firdes.low_pass(1.0, samp_rate, 1.5e3,128e3 - 1.5e3, firdes.WIN_BLACKMAN, 6.76)
         self.decimate_3 = decimate_3 = 5
         self.taps3_len = taps3_len = len(taps3)
         self.taps2_len = taps2_len = len(taps2)
@@ -140,6 +140,13 @@ class UDPDecimate(gr.top_block):
         self.decimate_2 = decimate_2
         self.set_samp_rate3(self.samp_rate2/self.decimate_2)
 
+    def get_samp_rate3(self):
+        return self.samp_rate3
+
+    def set_samp_rate3(self, samp_rate3):
+        self.samp_rate3 = samp_rate3
+        self.set_samp_rate4(self.samp_rate3/self.decimate_3)
+
     def get_taps3(self):
         return self.taps3
 
@@ -163,13 +170,6 @@ class UDPDecimate(gr.top_block):
         self.taps1 = taps1
         self.set_taps1_len(len(self.taps1))
         self.freq_xlating_fir_filter_xxx_0.set_taps(self.taps1)
-
-    def get_samp_rate3(self):
-        return self.samp_rate3
-
-    def set_samp_rate3(self, samp_rate3):
-        self.samp_rate3 = samp_rate3
-        self.set_samp_rate4(self.samp_rate3/self.decimate_3)
 
     def get_decimate_3(self):
         return self.decimate_3

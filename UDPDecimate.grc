@@ -140,7 +140,7 @@ blocks:
     comment: ''
     cutoff_freq: 1.5e3
     gain: '1.0'
-    samp_rate: samp_rate
+    samp_rate: samp_rate2
     width: 16e3 - 1.5e3
     win: firdes.WIN_BLACKMAN
   states:
@@ -169,7 +169,7 @@ blocks:
     comment: ''
     cutoff_freq: 1.5e3
     gain: '1.0'
-    samp_rate: samp_rate
+    samp_rate: samp_rate3
     width: 0.3e3
     win: firdes.WIN_KAISER
   states:
