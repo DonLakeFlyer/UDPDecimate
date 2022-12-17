@@ -239,11 +239,6 @@ def main(top_block_cls=UDPDecimate, options=None):
     signal.signal(signal.SIGTERM, sig_handler)
 
     tb.start()
-    try:
-        input('Press Enter to quit: ')
-    except EOFError:
-        pass
-    tb.stop()
     tb.wait()
 
 
