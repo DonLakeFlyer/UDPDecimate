@@ -15,7 +15,7 @@ options:
     output_language: python
     placement: (0,0)
     qt_qss_theme: ''
-    realtime_scheduling: '1'
+    realtime_scheduling: ''
     run: 'True'
     run_command: '{python} -u {filename}'
     run_options: run
@@ -249,6 +249,25 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [1259, 389]
+    rotation: 0
+    state: true
+- name: blocks_udp_sink_0_0
+  id: blocks_udp_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    eof: 'True'
+    ipaddr: 127.0.0.1
+    port: '20001'
+    psize: '1472'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1262, 263]
     rotation: 0
     state: true
 - name: final_decimation
@@ -782,6 +801,7 @@ connections:
 - [blocks_file_source_0, '0', blocks_throttle_0, '0']
 - [fir_filter_xxx_0_0, '0', fir_filter_xxx_0_0_0, '0']
 - [fir_filter_xxx_0_0_0, '0', blocks_udp_sink_0, '0']
+- [fir_filter_xxx_0_0_0, '0', blocks_udp_sink_0_0, '0']
 - [freq_xlating_fir_filter_xxx_0, '0', fir_filter_xxx_0_0, '0']
 - [osmosdr_source_0, '0', freq_xlating_fir_filter_xxx_0, '0']
 

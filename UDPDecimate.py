@@ -73,6 +73,7 @@ class UDPDecimate(gr.top_block):
         self.fir_filter_xxx_0_0_0.declare_sample_delay(0)
         self.fir_filter_xxx_0_0 = filter.fir_filter_ccf(decimate_2, taps2)
         self.fir_filter_xxx_0_0.declare_sample_delay(0)
+        self.blocks_udp_sink_0_0 = blocks.udp_sink(gr.sizeof_gr_complex*1, '127.0.0.1', 20001, 1472, True)
         self.blocks_udp_sink_0 = blocks.udp_sink(gr.sizeof_gr_complex*1, '127.0.0.1', 20000, 1472, True)
 
 
@@ -82,6 +83,7 @@ class UDPDecimate(gr.top_block):
         ##################################################
         self.connect((self.fir_filter_xxx_0_0, 0), (self.fir_filter_xxx_0_0_0, 0))
         self.connect((self.fir_filter_xxx_0_0_0, 0), (self.blocks_udp_sink_0, 0))
+        self.connect((self.fir_filter_xxx_0_0_0, 0), (self.blocks_udp_sink_0_0, 0))
         self.connect((self.freq_xlating_fir_filter_xxx_0, 0), (self.fir_filter_xxx_0_0, 0))
         self.connect((self.osmosdr_source_0, 0), (self.freq_xlating_fir_filter_xxx_0, 0))
 
@@ -226,8 +228,6 @@ def argument_parser():
 def main(top_block_cls=UDPDecimate, options=None):
     if options is None:
         options = argument_parser().parse_args()
-    if gr.enable_realtime_scheduling() != gr.RT_OK:
-        print("Error: failed to enable real-time scheduling.")
     tb = top_block_cls(final_decimation=options.final_decimation, gain=options.gain, pulse_duration=options.pulse_duration, pulse_freq=options.pulse_freq, samp_rate=options.samp_rate)
 
     def sig_handler(sig=None, frame=None):
